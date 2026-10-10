@@ -72,6 +72,33 @@ git clone https://github.com/lishiyu2006/astrbot_plugin_hydro_rank
 
 插件会自动安装 `requirements.txt` 中的依赖（`aiohttp`、`Pillow`）。安装后在 WebUI → 插件 → **Hydro 排行榜查询** → 配置，填写站点地址并保存。
 
+### 可选：给 Hydro 装配套插件（开启 API 通道）
+
+本仓库的 [`hydro_ranking_api/`](./hydro_ranking_api) 目录是一个 **Hydro 插件（addon）**，它在你的 Hydro 实例上注册 `POST /api/ranking`，让本插件能拿到结构化排行榜数据（更快、更稳）。**不装也能用**，会自动回退解析网页。
+
+在你的 Hydro 服务器上执行（假设已部署好 Hydro）：
+
+```bash
+# 1. 把 hydro_ranking_api 目录放到 Hydro 的 addons 目录
+mkdir -p ~/.hydro/addons/ranking-api
+cp hydro_ranking_api/index.ts hydro_ranking_api/package.json ~/.hydro/addons/ranking-api/
+
+# 2. 启用插件
+hydrooj addon add ranking-api
+
+# 3. 重启 Hydro（按你的部署方式，例如 systemd / pm2 / docker）
+```
+
+验证：
+
+```bash
+curl -s -X POST https://你的域名/api/ranking \
+  -H 'Content-Type: application/json' \
+  -d '{"domainId":"system","page":1,"limit":5}'
+```
+
+详见 [`hydro_ranking_api/README.md`](./hydro_ranking_api/README.md)。
+
 ## 配置项
 
 | 配置 | 说明 |
@@ -81,7 +108,7 @@ git clone https://github.com/lishiyu2006/astrbot_plugin_hydro_rank
 | 默认站点别名 `default_server_alias` | 默认 `main`，用于多站点时区分 |
 | 访问令牌 `token` | 可选。以 `Authorization: Bearer <token>` 发送，用于排行榜需要登录才可见的站点 |
 | 额外站点 `extra_servers` | 每行一个，格式 `别名\|站点地址\|域ID\|Token`（后三项可省略）。以 `#` 开头的行会被忽略 |
-| 优先使用排行榜 API `prefer_api` | 默认开启。目标站点装了 [`hydro_ranking_api`](https://github.com/lishiyu2006/hydro_ranking_api) 时走 `POST /api/ranking`；接口不可用自动回退解析网页。关闭则始终解析网页 |
+| 优先使用排行榜 API `prefer_api` | 默认开启。目标站点装了 [`hydro_ranking_api`](https://github.com/lishiyu2006/astrbot_plugin_hydro_rank/tree/main/hydro_ranking_api) 时走 `POST /api/ranking`；接口不可用自动回退解析网页。关闭则始终解析网页 |
 | 每次展示条数 `rows_per_page` | 默认 10，最大 100 |
 | 渲染为图片 `enable_image` | 默认开启 |
 | 显示个人简介列 `show_bio` | 默认关闭 |
@@ -134,7 +161,7 @@ class DomainRankHandler extends Handler {
 
 本插件按可靠性从高到低自动选择取数方式：
 
-1. **排行榜 API（首选，需目标站点安装 [`hydro_ranking_api`](https://github.com/lishiyu2006/hydro_ranking_api)）**
+1. **排行榜 API（首选，需目标站点安装 [`hydro_ranking_api`](https://github.com/lishiyu2006/astrbot_plugin_hydro_rank/tree/main/hydro_ranking_api)）**
 
    `POST {站点根}/api/ranking`，body 为 `{"domainId":"system","page":1,"limit":100}`，
    返回结构化 JSON，含 `rank / uid / uname / rp / level / nSubmit / nAccept / rpInfo`。
