@@ -1,0 +1,15 @@
+# 仅用于开发期工具配置（ruff）。插件运行不依赖本文件，
+# 依赖声明请见 requirements.txt（AstrBot 使用 pip 的 requirements.txt 管理插件依赖）。
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["__pycache__", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "C4", "SIM", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

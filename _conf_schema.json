@@ -1,0 +1,113 @@
+{
+  "base_url": {
+    "description": "Hydro 站点地址",
+    "type": "string",
+    "hint": "你的 Hydro 服务器根地址，例如 https://hydro.ac 或 https://oj.example.com。也可以直接填 .../d/domain/ranking 形式的完整地址。",
+    "obvious_hint": true,
+    "default": ""
+  },
+  "domain": {
+    "description": "域（domain）ID",
+    "type": "string",
+    "hint": "留空则查询主域。填写后实际请求 /d/<域ID>/ranking，例如填写 system 会请求 /d/system/ranking。",
+    "default": ""
+  },
+  "default_server_alias": {
+    "description": "默认站点别名",
+    "type": "string",
+    "hint": "上面这个站点在指令中使用的别名，默认 main。",
+    "default": "main"
+  },
+  "token": {
+    "description": "访问令牌（可选）",
+    "type": "string",
+    "hint": "若站点限制了排行榜的可见权限，可填写访问令牌，会以 Authorization: Bearer <token> 发送。",
+    "secret": true,
+    "default": ""
+  },
+  "extra_servers": {
+    "description": "额外的 Hydro 站点",
+    "type": "text",
+    "hint": "每行一个站点，格式：别名|站点地址|域ID|Token（后三项可省略，用 | 或 , 分隔）。例如：\n主站|https://hydro.ac\n校赛|https://oj.school.edu.cn|system\n留空表示只使用上面的站点。",
+    "default": ""
+  },
+  "rows_per_page": {
+    "description": "每次展示的条数",
+    "type": "int",
+    "hint": "不指定数量时默认展示多少名，最大 100。",
+    "default": 10,
+    "slider": {
+      "min": 1,
+      "max": 100,
+      "step": 1
+    }
+  },
+  "enable_image": {
+    "description": "渲染为图片",
+    "type": "bool",
+    "hint": "开启后会把排行榜画成表格图片发送（观感更好，需要 Pillow）。关闭则发送纯文本。渲染失败会自动回退为文本。",
+    "default": true
+  },
+  "show_bio": {
+    "description": "显示个人简介列",
+    "type": "bool",
+    "hint": "简介内容可能较长，建议只在需要时开启。",
+    "default": false
+  },
+  "max_scan_pages": {
+    "description": "查找用户时最大扫描页数",
+    "type": "int",
+    "hint": "查找用户需要在排行榜中逐页搜索，每页 100 人。数值越大越慢，默认扫描前 20 页（约 2000 名）。",
+    "default": 20,
+    "slider": {
+      "min": 1,
+      "max": 100,
+      "step": 1
+    }
+  },
+  "admin_only_find": {
+    "description": "查找功能仅管理员可用",
+    "type": "bool",
+    "hint": "开启后，只有 AstrBot 管理员可以使用 find/user 子命令，避免被频繁触发大量请求。",
+    "default": false
+  },
+  "timeout": {
+    "description": "请求超时（秒）",
+    "type": "int",
+    "default": 15,
+    "slider": {
+      "min": 3,
+      "max": 60,
+      "step": 1
+    }
+  },
+  "cache_ttl": {
+    "description": "缓存时间（秒）",
+    "type": "int",
+    "hint": "同一页排行榜在该时间内重复查询会直接命中缓存，避免频繁请求对方服务器。设为 0 表示不缓存。",
+    "default": 60,
+    "slider": {
+      "min": 0,
+      "max": 600,
+      "step": 10
+    }
+  },
+  "font_path": {
+    "description": "图片渲染字体路径（可选）",
+    "type": "string",
+    "hint": "留空会自动在系统中查找中文字体（微软雅黑 / 思源黑体 / 文泉驿等）。若图片中文显示为方框，请在此指定一个 .ttf/.ttc 字体文件。",
+    "default": ""
+  },
+  "proxy": {
+    "description": "HTTP 代理（可选）",
+    "type": "string",
+    "hint": "如 http://127.0.0.1:7890，留空则不使用代理。",
+    "default": ""
+  },
+  "user_agent": {
+    "description": "自定义 User-Agent（可选）",
+    "type": "string",
+    "hint": "部分站点会校验 UA，留空使用内置默认值。",
+    "default": ""
+  }
+}

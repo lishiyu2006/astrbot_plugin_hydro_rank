@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "display_name": "Hydro 排行榜查询",
+    "short_desc": "查询自定义 Hydro(OJ) 服务器排行榜，支持多站点、分页与图片输出。",
+    "desc": "让 AstrBot 接入自定义 Hydro（HydroOJ）服务器的排行榜。\n\n- 查询排行榜前 N 名或指定页，列配置随站点自适应（排名 / 用户名 / RP / 题目 / 比赛 / 签到 / 贡献 / 通过 / 简介）\n- 支持配置多个 Hydro 站点，用别名一键切换\n- 支持 Hydro 的「域（domain）」，自动请求 `/d/<域ID>/ranking`\n- 按用户名或 UID 跨页查找某人排名，命中后高亮展示\n- 默认渲染成表格图片，没有可用中文字体时自动回退为纯文本\n- 内置缓存，避免频繁请求对方服务器\n\n指令：`/hydro_rank`（别名 `/排名`）。发送 `/hydro_rank help` 查看完整用法。"
+  },
+  "config": {
+    "base_url": {
+      "description": "站点地址",
+      "hint": "你的 Hydro 站点根地址，例如 https://hydro.ac。也可以直接粘贴 https://oj.example.com/d/system/ranking 这类完整地址。"
+    },
+    "domain": {
+      "description": "域 ID",
+      "hint": "填写后请求 /d/<域ID>/ranking；留空则查询主域。Hydro 默认域 ID 为 system。"
+    },
+    "default_server_alias": {
+      "description": "默认站点别名",
+      "hint": "用于多站点时区分，指令中不带别名时使用它。"
+    },
+    "token": {
+      "description": "访问令牌",
+      "hint": "可选。以 Authorization: Bearer <token> 发送，用于排行榜需要登录才可见的站点。"
+    },
+    "extra_servers": {
+      "description": "额外站点",
+      "hint": "每行一个，格式：别名|站点地址|域ID|Token（后三项可省略）。以 # 开头的行会被忽略。"
+    },
+    "rows_per_page": {
+      "description": "每次展示条数",
+      "hint": "指令中不写数量时展示多少条。Hydro 每页最多 100 条。"
+    },
+    "enable_image": {
+      "description": "渲染为图片",
+      "hint": "关闭后改为发送纯文本，适合不支持图片的平台或无法安装 Pillow 的环境。"
+    },
+    "show_bio": {
+      "description": "显示个人简介列",
+      "hint": "简介可能很长，开启后图片会更宽。"
+    },
+    "max_scan_pages": {
+      "description": "查找最大扫描页数",
+      "hint": "查找用户时最多向后扫描多少页，每页 100 人。调小更快返回，调大覆盖更多用户。"
+    },
+    "admin_only_find": {
+      "description": "查找功能仅管理员可用",
+      "hint": "开启后 find / user 子指令只有 AstrBot 管理员可以调用。"
+    },
+    "timeout": {
+      "description": "请求超时（秒）",
+      "hint": "单次 HTTP 请求的超时时间。"
+    },
+    "cache_ttl": {
+      "description": "缓存时间（秒）",
+      "hint": "同一页在缓存时间内不会重复请求对方服务器。设为 0 关闭缓存。"
+    },
+    "font_path": {
+      "description": "字体路径",
+      "hint": "图片中文显示为方框时，指定一个中文字体文件，例如 C:\\Windows\\Fonts\\msyh.ttc。留空则自动探测常见字体。"
+    },
+    "proxy": {
+      "description": "HTTP 代理",
+      "hint": "可选，例如 http://127.0.0.1:7890。留空则自动读取环境变量中的代理设置。"
+    },
+    "user_agent": {
+      "description": "User-Agent",
+      "hint": "可选。部分站点会校验 UA，留空则使用插件内置的浏览器 UA。"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "display_name": "Hydro Ranking",
+    "short_desc": "Query rankings on your own Hydro (HydroOJ) server, with multi-site support and image output.",
+    "desc": "Bring the ranking board of your own **Hydro (HydroOJ)** server into AstrBot.\n\n- Show the top N users or any page; columns adapt to each site (rank / username / RP / problems / contests / check-ins / contribution / accepted / bio)\n- Configure several Hydro sites and switch between them with an alias\n- Supports Hydro domains: requests `/d/<domain>/ranking` automatically\n- Look up a user's rank by username or UID across pages, with the matched row highlighted\n- Renders a table image by default, and falls back to plain text when no CJK font is available\n- Built-in cache to avoid hammering the target server\n\nCommand: `/hydro_rank` (alias `/排名`). Send `/hydro_rank help` for full usage."
+  },
+  "config": {
+    "base_url": {
+      "description": "Site URL",
+      "hint": "Root URL of your Hydro site, e.g. https://hydro.ac. You may also paste a full URL such as https://oj.example.com/d/system/ranking."
+    },
+    "domain": {
+      "description": "Domain ID",
+      "hint": "When set, requests go to /d/<domain>/ranking. Leave empty to query the main domain. Hydro's default domain ID is system."
+    },
+    "default_server_alias": {
+      "description": "Default site alias",
+      "hint": "Used to tell sites apart when several are configured; applied when no alias is given in the command."
+    },
+    "token": {
+      "description": "Access token",
+      "hint": "Optional. Sent as Authorization: Bearer <token> for sites whose ranking is only visible to logged-in users."
+    },
+    "extra_servers": {
+      "description": "Additional sites",
+      "hint": "One per line, format: alias|site-url|domain-id|token (the last three are optional). Lines starting with # are ignored."
+    },
+    "rows_per_page": {
+      "description": "Rows per reply",
+      "hint": "How many rows to show when the command has no count. Hydro returns at most 100 rows per page."
+    },
+    "enable_image": {
+      "description": "Render as image",
+      "hint": "Turn off to send plain text instead, for platforms without image support or environments where Pillow cannot be installed."
+    },
+    "show_bio": {
+      "description": "Show bio column",
+      "hint": "Bios can be long, so enabling this makes the image wider."
+    },
+    "max_scan_pages": {
+      "description": "Max pages to scan",
+      "hint": "How many pages to scan when looking up a user, 100 users per page. Smaller is faster, larger covers more users."
+    },
+    "admin_only_find": {
+      "description": "Lookup is admin only",
+      "hint": "When enabled, the find / user subcommands are restricted to AstrBot administrators."
+    },
+    "timeout": {
+      "description": "Request timeout (seconds)",
+      "hint": "Timeout for a single HTTP request."
+    },
+    "cache_ttl": {
+      "description": "Cache TTL (seconds)",
+      "hint": "The same page will not be re-requested within this window. Set to 0 to disable caching."
+    },
+    "font_path": {
+      "description": "Font path",
+      "hint": "If Chinese characters render as boxes, point this to a CJK font file, e.g. C:\\Windows\\Fonts\\msyh.ttc. Leave empty to auto-detect common fonts."
+    },
+    "proxy": {
+      "description": "HTTP proxy",
+      "hint": "Optional, e.g. http://127.0.0.1:7890. Leave empty to use proxy settings from environment variables."
+    },
+    "user_agent": {
+      "description": "User-Agent",
+      "hint": "Optional. Some sites validate the UA; leave empty to use the built-in browser UA."
+    }
+  }
+}

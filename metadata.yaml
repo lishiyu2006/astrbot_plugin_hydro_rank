@@ -1,0 +1,46 @@
+name: astrbot_plugin_hydro_rank # 插件标识符，英文，唯一（全小写、无空格）
+display_name: Hydro 排行榜查询 # 插件展示名称
+short_desc: 查询自定义 Hydro(OJ) 服务器排行榜，支持多站点、分页与图片输出。 # 紧凑 UI 使用的短描述
+desc: | # 详细描述，支持 Markdown
+  让 AstrBot 接入**自定义 Hydro（HydroOJ）服务器**的排行榜。
+
+  - 查询排行榜前 N 名或指定页，列配置随站点自适应（排名 / 用户名 / RP / 题目 / 比赛 / 签到 / 贡献 / 通过 / 简介）
+  - 支持配置多个 Hydro 站点，用别名一键切换
+  - 支持 Hydro 的「域（domain）」，自动请求 `/d/<域ID>/ranking`
+  - 按用户名或 UID 跨页查找某人排名，命中后高亮展示
+  - 默认渲染成表格图片，没有可用中文字体时自动回退为纯文本
+  - 内置缓存，避免频繁请求对方服务器
+
+  指令：`/hydro_rank`（别名 `/排名`）。发送 `/hydro_rank help` 查看完整用法。
+version: 1.0.0 # 插件版本号（语义化版本）
+author: lishiyu2006 # 作者名称（须与 plugin_id 的命名空间一致）
+repo: https://github.com/lishiyu2006/astrbot_plugin_hydro_rank # 插件仓库地址
+astrbot_version: ">=4.5" # 支持的 AstrBot 版本范围
+support_platforms: # 支持的平台适配器
+  - aiocqhttp
+  - qq_official
+  - qq_official_webhook
+  - telegram
+  - wecom
+  - wecom_ai_bot
+  - lark
+  - dingtalk
+  - discord
+  - slack
+  - kook
+  - vocechat
+  - weixin_official_account
+  - weixin_oc
+  - satori
+  - misskey
+  - line
+  - matrix
+  - mattermost
+social_link: https://github.com/lishiyu2006 # 作者主页
+tags: # 标签列表，用于插件市场分类和搜索
+  - Hydro
+  - HydroOJ
+  - OJ
+  - 排行榜
+  - 查询
+  - 工具
