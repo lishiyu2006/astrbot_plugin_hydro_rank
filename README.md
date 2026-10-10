@@ -12,9 +12,10 @@
 ## 功能
 
 - 📊 查询排行榜，自动读取「排名 / 用户名 / RP / 题目 / 比赛 / 签到 / 贡献 / 通过 / 简介」等列（列随站点配置自适应，缺列不会报错）
+- 🔌 **双通道取数**：目标站点装了排行榜 API 插件就走 `POST /api/ranking` 拿结构化数据，否则自动回退解析网页，兼容所有 Hydro 站点
 - 🖼️ 默认渲染成表格图片，观感好；没有可用中文字体时自动回退为纯文本
 - 🌐 支持配置多个 Hydro 站点，用别名切换（如 `/hydro_rank 校赛 20`）
-- 🔍 按用户名或 UID 跨页查找某人排名，命中后高亮展示
+- 🔍 按用户名或 UID 查找某人排名，命中后高亮展示（走 API 时一次请求搞定）
 - 🏷️ 支持 Hydro 的「域（domain）」，自动请求 `/d/<域ID>/ranking`
 - ⚡ 内置缓存，避免频繁请求对方服务器
 - 🌍 插件名称与配置项支持中英文（`.astrbot-plugin/i18n/`）
@@ -80,6 +81,7 @@ git clone https://github.com/lishiyu2006/astrbot_plugin_hydro_rank
 | 默认站点别名 `default_server_alias` | 默认 `main`，用于多站点时区分 |
 | 访问令牌 `token` | 可选。以 `Authorization: Bearer <token>` 发送，用于排行榜需要登录才可见的站点 |
 | 额外站点 `extra_servers` | 每行一个，格式 `别名\|站点地址\|域ID\|Token`（后三项可省略）。以 `#` 开头的行会被忽略 |
+| 优先使用排行榜 API `prefer_api` | 默认开启。目标站点装了 [`hydro_ranking_api`](https://github.com/lishiyu2006/hydro_ranking_api) 时走 `POST /api/ranking`；接口不可用自动回退解析网页。关闭则始终解析网页 |
 | 每次展示条数 `rows_per_page` | 默认 10，最大 100 |
 | 渲染为图片 `enable_image` | 默认开启 |
 | 显示个人简介列 `show_bio` | 默认关闭 |
@@ -130,12 +132,31 @@ class DomainRankHandler extends Handler {
 }
 ```
 
-本插件用两种方式取数：
+本插件按可靠性从高到低自动选择取数方式：
 
-1. **`GET /ranking?page=N`（`Accept: text/html`）** —— 服务端渲染出完整的排行榜 `<table>`，字段最全。插件用标准库 `html.parser` 解析，按 `<th>` 文本识别列，因此不依赖具体主题的 class 名。
-2. **同地址 + `Accept: application/json`** —— Hydro 的服务端框架在客户端接受 JSON 时会把 `response.body` 序列化返回：`{"udocs": [...], "upcount": 108, "ucount": 10784, "page": 1}`。其中 `upcount` 是总页数、`ucount` 是总人数，用它取总数最准确。
+1. **排行榜 API（首选，需目标站点安装 [`hydro_ranking_api`](https://github.com/lishiyu2006/hydro_ranking_api)）**
 
-两者结合：表格拿明细，JSON 拿总数，结果带 TTL 缓存。
+   `POST {站点根}/api/ranking`，body 为 `{"domainId":"system","page":1,"limit":100}`，
+   返回结构化 JSON，含 `rank / uid / uname / rp / level / nSubmit / nAccept / rpInfo`。
+   取数不受页面改版影响，且查找用户只需一次请求。
+
+   > Hydro 核心自带的 HTTP API（`/api/:op`）**只有 8 个操作**
+   > （`domain` / `domain.current` / `groups` / `domain.group` / `problem` / `problems` / `user` / `users`），
+   > **没有排行榜**。上面这个操作由插件补上。
+   > 探测失败（404 / 非 JSON / 缺字段 / 无权限）会自动降级到方式 2。
+
+2. **`GET /ranking?page=N`（`Accept: text/html`）** —— 通用兜底。服务端渲染出完整的排行榜 `<table>`，字段最全。插件用标准库 `html.parser` 解析，按 `<th>` 文本识别列，因此不依赖具体主题的 class 名。任何 Hydro 站点都能用。
+
+3. **同地址 + `Accept: application/json`** —— **仅用于取总数**。Hydro 的服务端框架在客户端接受 JSON 时会把 `response.body` 序列化返回：`{"udocs": [...], "upcount": 108, "ucount": 10784, "page": 1}`，其中 `upcount` 是总页数、`ucount` 是总人数。
+
+   > ⚠️ 这里的 `udocs` 是**原始用户文档**（`_id` / `uname` / `mail` / `perm` / `priv` / `role` / `regat` / `loginat` / `avatar`），
+   > **不含 RP、排名、题数、通过数**，还带 `mail`。
+   > 根因在 `model/setting.ts`：`rp` / `rank` / `nAccept` 等被定义为 `DomainUserSetting` 的 `setting_storage` 族，
+   > 既没有 `FLAG_PUBLIC` 也没有 `FLAG_PRIVATE`；而 `model/user.ts` 的 `User.serialize()`
+   > 只输出 `pick(this, getFields('public'))`，于是这些字段**永远被 JSON 序列化丢弃**。
+   > 所以这个接口拿不到排行榜数据，只能用来取总数。
+
+想关掉 API 通道、始终解析网页，把配置项「优先使用排行榜 API」设为关闭即可。
 
 ## 常见问题
 

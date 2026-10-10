@@ -25,6 +25,10 @@
       "description": "额外站点",
       "hint": "每行一个，格式：别名|站点地址|域ID|Token（后三项可省略）。以 # 开头的行会被忽略。"
     },
+    "prefer_api": {
+      "description": "优先使用排行榜 API",
+      "hint": "若目标 Hydro 装了「排行榜 API」插件（提供 POST /api/ranking），开启后优先走该接口，取到结构化数据、不受页面改版影响；接口不可用会自动回退到解析网页。关闭则始终解析网页。"
+    },
     "rows_per_page": {
       "description": "每次展示条数",
       "hint": "指令中不写数量时展示多少条。Hydro 每页最多 100 条。"

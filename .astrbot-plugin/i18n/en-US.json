@@ -25,6 +25,10 @@
       "description": "Additional sites",
       "hint": "One per line, format: alias|site-url|domain-id|token (the last three are optional). Lines starting with # are ignored."
     },
+    "prefer_api": {
+      "description": "Prefer ranking API",
+      "hint": "If the target Hydro has the Ranking API addon (POST /api/ranking), enable this to fetch structured data that survives theme changes. Falls back to HTML parsing automatically when unavailable. Disable to always parse the web page."
+    },
     "rows_per_page": {
       "description": "Rows per reply",
       "hint": "How many rows to show when the command has no count. Hydro returns at most 100 rows per page."

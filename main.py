@@ -103,8 +103,8 @@ def _split_extra_line(line: str) -> ServerConfig | None:
 @register(
     PLUGIN_NAME,
     "WorkBuddy",
-    "查询自定义 Hydro(OJ) 服务器的排行榜，支持多站点、分页、按用户名/UID 查找，并可渲染为图片。",
-    "1.0.0",
+    "查询自定义 Hydro(OJ) 服务器的排行榜：优先走排行榜 API，不可用时自动回退解析网页；支持多站点、分页、按用户名/UID 查找，并可渲染为图片。",
+    "1.1.0",
 )
 class HydroRankPlugin(Star):
     """Hydro 排行榜查询插件。"""
@@ -191,6 +191,7 @@ class HydroRankPlugin(Star):
                 timeout=int(self._cfg("timeout", 15)),
                 proxy=str(self._cfg("proxy", "") or ""),
                 user_agent=str(self._cfg("user_agent", "") or ""),
+                prefer_api=bool(self._cfg("prefer_api", True)),
             )
             # 配置变更后旧的会话不再需要，顺手清理
             for old_key, old in list(self._clients.items()):

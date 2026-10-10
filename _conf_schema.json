@@ -31,6 +31,12 @@
     "hint": "每行一个站点，格式：别名|站点地址|域ID|Token（后三项可省略，用 | 或 , 分隔）。例如：\n主站|https://hydro.ac\n校赛|https://oj.school.edu.cn|system\n留空表示只使用上面的站点。",
     "default": ""
   },
+  "prefer_api": {
+    "description": "优先使用排行榜 API",
+    "type": "bool",
+    "hint": "若目标 Hydro 装了「排行榜 API」插件（提供 POST /api/ranking），开启后会优先走该接口，取到结构化数据、不受页面改版影响；接口不可用时会自动回退到解析网页。关闭则始终解析网页。",
+    "default": true
+  },
   "rows_per_page": {
     "description": "每次展示的条数",
     "type": "int",

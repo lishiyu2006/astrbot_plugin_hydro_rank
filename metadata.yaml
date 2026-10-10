@@ -4,15 +4,16 @@ short_desc: 查询自定义 Hydro(OJ) 服务器排行榜，支持多站点、分
 desc: | # 详细描述，支持 Markdown
   让 AstrBot 接入**自定义 Hydro（HydroOJ）服务器**的排行榜。
 
+  - **双通道取数**：目标站点若装了排行榜 API 插件则走 `POST /api/ranking` 拿结构化数据，否则自动回退到解析网页，兼容所有 Hydro 站点
   - 查询排行榜前 N 名或指定页，列配置随站点自适应（排名 / 用户名 / RP / 题目 / 比赛 / 签到 / 贡献 / 通过 / 简介）
   - 支持配置多个 Hydro 站点，用别名一键切换
   - 支持 Hydro 的「域（domain）」，自动请求 `/d/<域ID>/ranking`
-  - 按用户名或 UID 跨页查找某人排名，命中后高亮展示
+  - 按用户名或 UID 查找某人排名，命中后高亮展示
   - 默认渲染成表格图片，没有可用中文字体时自动回退为纯文本
   - 内置缓存，避免频繁请求对方服务器
 
   指令：`/hydro_rank`（别名 `/排名`）。发送 `/hydro_rank help` 查看完整用法。
-version: 1.0.0 # 插件版本号（语义化版本）
+version: 1.1.0 # 插件版本号（语义化版本）
 author: lishiyu2006 # 作者名称（须与 plugin_id 的命名空间一致）
 repo: https://github.com/lishiyu2006/astrbot_plugin_hydro_rank # 插件仓库地址
 astrbot_version: ">=4.5" # 支持的 AstrBot 版本范围
