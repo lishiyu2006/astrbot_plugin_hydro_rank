@@ -13,7 +13,7 @@ desc: | # 详细描述，支持 Markdown
   - 内置缓存，避免频繁请求对方服务器
 
   指令：`/hydro_rank`（别名 `/排名`）。发送 `/hydro_rank help` 查看完整用法。
-version: 1.1.0 # 插件版本号（语义化版本）
+version: 1.1.1 # 插件版本号（语义化版本）
 author: lishiyu2006 # 作者名称（须与 plugin_id 的命名空间一致）
 repo: https://github.com/lishiyu2006/astrbot_plugin_hydro_rank # 插件仓库地址
 astrbot_version: ">=4.5" # 支持的 AstrBot 版本范围

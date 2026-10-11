@@ -104,7 +104,7 @@ def _split_extra_line(line: str) -> ServerConfig | None:
     PLUGIN_NAME,
     "WorkBuddy",
     "查询自定义 Hydro(OJ) 服务器的排行榜：优先走排行榜 API，不可用时自动回退解析网页；支持多站点、分页、按用户名/UID 查找，并可渲染为图片。",
-    "1.1.0",
+    "1.1.1",
 )
 class HydroRankPlugin(Star):
     """Hydro 排行榜查询插件。"""
