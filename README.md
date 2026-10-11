@@ -167,6 +167,10 @@ class DomainRankHandler extends Handler {
    返回结构化 JSON，含 `rank / uid / uname / rp / level / nSubmit / nAccept / rpInfo`。
    取数不受页面改版影响，且查找用户只需一次请求。
 
+   > `rank` 的语义随调用方式变化：分页浏览时是"本页第几个"（与排名页一致）；
+   > 带 `search` 时是**该用户在本域的真实名次**——否则过滤后的子集会让每个人都变成第 1 名，
+   > 那样 `find` 会报错名次、并按错误的名次去翻页。详见 `hydro_ranking_api/README.md`。
+
    > Hydro 核心自带的 HTTP API（`/api/:op`）**只有 8 个操作**
    > （`domain` / `domain.current` / `groups` / `domain.group` / `problem` / `problems` / `user` / `users`），
    > **没有排行榜**。上面这个操作由插件补上。

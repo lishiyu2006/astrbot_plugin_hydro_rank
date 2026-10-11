@@ -14,6 +14,9 @@ venv/
 env/
 ENV/
 
+# Node（验证脚本用）
+node_modules/
+
 # 测试与缓存
 .pytest_cache/
 .ruff_cache/

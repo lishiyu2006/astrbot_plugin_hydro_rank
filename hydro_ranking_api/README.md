@@ -103,12 +103,19 @@ curl -X POST https://your-oj.example.com/api/ranking \
 
 | 字段 | 含义 |
 |---|---|
-| `rank` | 按本页位置计算的连续名次 |
-| `rankStored` | 数据库里 `domain.user.rank` 存的名次（同分同名，可能为 `null`） |
-| `level` | 等级，由 `script/rating.ts` 的 `calcLevel()` 按名次百分位写入 |
+| `rank` | 名次。**分页浏览**时等于本页位置 `(page-1)*limit + i + 1`（与排名页显示一致）；**带 `search`** 时是该用户在本域榜单上的**真实名次**（rp 严格高于他的人数 + 1），因为此时结果是过滤后的子集，按下标算会失真 |
+| `rankStored` | 数据库里 `domain.user.rank` 存的名次（Hydro 的 `calcLevel()` 写入，同分同名，可能为 `null`） |
+| `level` | 等级，是 `LEVELS = [100,90,70,55,40,30,20,10,5,2,1]` 的**下标**（越大越好），0 为最低档 |
 | `rp` | 总 RP |
 | `rpInfo` | RP 来源拆分（`problem` 做题 / `contest` 比赛 / `delta` 手动调整） |
 | `nSubmit` / `nAccept` | 提交数 / 通过数 |
+| `displayName` | 域内昵称（`DomainUserSetting`，默认空串） |
+
+### 参数类型提示
+
+入参用 `Schema.number()` 声明，**schemastery 不做字符串转换**：`page` 必须传 JSON number，
+传 `"2"` 会被拒（HTTP 400 `$.page expected number but got 2`）。
+`domainId` / `search` 是可选字符串，不传不会报错。
 
 ## 权限
 
@@ -134,6 +141,29 @@ mongosh hydro --eval 'db.getCollection("domain.user")
 ```
 
 本插件的价值在于把它变成一个**稳定的 HTTP 接口**，供远程程序长期调用。
+
+## 已验证
+
+针对 `hydrooj 5.0.7` 源码逐行核对 + 真实 MongoDB 运行验证：
+
+- **集合位置**：`model/domain.ts:14` 是 `db.collection('domain.user')`；`service/db.ts:68-71` 只在
+  配置了 `db.prefix` 时才加前缀（默认无）。已在真实 MongoDB 上断言实际集合名就是 `domain.user`。
+- **筛选条件**：与核心 `DomainRankHandler`（`handler/domain.ts:28-32`）逐字一致 ——
+  `{ uid: { $gt: 1 }, rp: { $gt: 0 }, join: true }` + `.sort({ rp: -1 })`。
+- **分页数学**：`upcount` / `ucount` 与 `service/db.ts:156-165` 的 `paginate()` 等价。
+- **字段名**：`rp` / `rpInfo` / `rank` / `level` / `nSubmit` / `nAccept` / `join` / `displayName`
+  全部来自 `model/setting.ts:284-294` 的 `DomainUserSetting`。
+- **`rpInfo` 的键**：`script/rating.ts:30,57` 的 `RpTypes` 只有 `problem` 与 `contest`。
+- **注册方式**：`api.provide()` 与 `declare module '@hydrooj/framework'` 的写法与核心
+  `handler/domain.ts:473-492` 完全相同。
+- **请求体**：`framework/framework/base.ts:50-52` 把 `ctx.request.body` 并进 `args`，
+  `koa-body` 默认解析 `application/json`，所以 JSON POST 可用。
+- **权限**：`PERM_VIEW_RANKING` 在 `PERM_BASIC`（guest）与 `PERM_DEFAULT` 里都有，
+  匿名请求也能过（`packages/common/permission.ts:98-153`）。
+- **限流**：`limitRate('global', 5, 100)` 是 **5 秒 100 次**（参数序为 period,max），不会挡住分页抓取。
+
+运行验证脚本 `verify_ranking_api.cjs`（真实 MongoDB + 真实 schemastery + esbuild 编译真实 `index.ts`）：
+**33/33 通过**，覆盖分页/排序/域隔离/越界页/权限/参数校验/search 真实名次。
 
 ## License
 

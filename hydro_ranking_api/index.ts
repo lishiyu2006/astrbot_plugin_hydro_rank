@@ -14,6 +14,11 @@
  *   POST /api/ranking
  *   { "domainId": "system", "page": 1, "limit": 100 }
  *   { "domainId": "system", "search": "liujiameng" }   // 按用户名前缀查
+ *
+ * 返回行里的 rank 语义：
+ *   - 分页浏览（无 search）：与排名页一致的下标名次 (page-1)*limit + i + 1
+ *   - 查找（有 search）：该用户在本域榜单上的真实名次（rp 高于他的人数 + 1）
+ *   两者都不受“当前结果被过滤”影响；rankStored 始终是 Hydro 自己算好并落库的 rank。
  */
 import {
     Context, DomainModel, PERM, PermissionError, Query, Schema, UserModel,
@@ -24,6 +29,9 @@ const MAX_LIMIT = 100;
 
 /** 与核心 DomainRankHandler 保持一致的筛选条件。 */
 const baseFilter = () => ({ uid: { $gt: 1 }, rp: { $gt: 0 }, join: true });
+
+/** 统计“排在我前面的人数”用的筛选条件（名次 = 该人数 + 1）。 */
+const rankFilter = (rp: number) => ({ uid: { $gt: 1 }, join: true, rp: { $gt: rp } });
 
 const RankingApi = {
     ranking: Query(Schema.object({
@@ -61,6 +69,19 @@ const RankingApi = {
 
         const udict = await UserModel.getList(domainId, dudocs.map((d: any) => d.uid));
 
+        // search 模式下结果是“被过滤的子集”，按数组下标算名次会失真（每个人都是第 1 名），
+        // 因此改为反查真实名次：名次 = 榜单里 rp 严格高于本行的人数 + 1。
+        // 非 search（分页浏览）时沿用与排名页一致的下标算法，零额外开销。
+        let ranks: number[] | null = null;
+        if (args.search) {
+            const distinctRp: number[] = [...new Set(dudocs.map((d: any) => d.rp))];
+            const above = new Map<number, number>();
+            await Promise.all(distinctRp.map(async (rp: number) => {
+                above.set(rp, await DomainModel.collUser.countDocuments({ domainId, ...rankFilter(rp) }));
+            }));
+            ranks = dudocs.map((d: any) => (above.get(d.rp) || 0) + 1);
+        }
+
         return {
             domainId,
             page,
@@ -70,7 +91,7 @@ const RankingApi = {
             rows: dudocs.map((d: any, i: number) => {
                 const u: any = udict[d.uid] || {};
                 return {
-                    rank: (page - 1) * limit + i + 1,
+                    rank: ranks ? ranks[i] : (page - 1) * limit + i + 1,
                     uid: d.uid,
                     uname: u.uname || '',
                     displayName: d.displayName || u.displayName || '',

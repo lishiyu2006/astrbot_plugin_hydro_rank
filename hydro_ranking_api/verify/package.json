@@ -1,0 +1,15 @@
+{
+  "name": "ranking-api-verify",
+  "private": true,
+  "version": "1.0.0",
+  "description": "用真实 MongoDB 验证 hydro_ranking_api 插件",
+  "scripts": {
+    "verify": "node verify_ranking_api.cjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "mongodb": "^6.10.0",
+    "mongodb-memory-server": "^10.1.0",
+    "schemastery": "^3.18.0"
+  }
+}

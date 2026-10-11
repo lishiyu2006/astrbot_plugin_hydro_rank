@@ -1,6 +1,6 @@
 {
   "name": "@hydrooj/ranking-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "为 Hydro 增加一个排行榜 API 操作（/api/ranking），供外部程序以 JSON 获取域排行榜",
   "main": "index.ts",
   "license": "MIT",
